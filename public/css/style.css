@@ -40,6 +40,8 @@ h1, h2, h3 { line-height: 1.35; margin: 0 0 .5em; letter-spacing: -0.02em; }
 .site-nav a:hover { background: var(--bg-alt); }
 .site-nav a[aria-current="page"] { color: var(--accent); }
 .site-nav .nav-admin { margin-left: 8px; border: 1px solid var(--line); font-size: 14px; color: var(--muted); }
+.site-nav .nav-lang { margin-left: 8px; font-size: 14px; color: var(--navy-2); border: 1px solid var(--line); }
+.lang-en .brand-text strong { font-size: 16px; }
 .nav-toggle { display: none; background: none; border: 0; width: 44px; height: 44px; padding: 10px; cursor: pointer; }
 .nav-toggle span { display: block; height: 2px; background: var(--navy); margin: 5px 0; border-radius: 2px; transition: .2s; }
 @media (max-width: 960px) {
@@ -47,7 +49,7 @@ h1, h2, h3 { line-height: 1.35; margin: 0 0 .5em; letter-spacing: -0.02em; }
   .site-nav { display: none; position: absolute; top: 68px; left: 0; right: 0; background: #fff; border-bottom: 1px solid var(--line); flex-direction: column; align-items: stretch; padding: 8px 16px 16px; box-shadow: 0 10px 20px rgba(0,0,0,.06); }
   .site-nav.open { display: flex; }
   .site-nav a { padding: 12px 8px; border-bottom: 1px solid var(--bg-alt); border-radius: 0; }
-  .site-nav .nav-admin { margin: 8px 0 0; border-radius: 8px; text-align: center; }
+  .site-nav .nav-admin, .site-nav .nav-lang { margin: 8px 0 0; border-radius: 8px; text-align: center; }
   .nav-toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
   .nav-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
   .nav-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
@@ -180,6 +182,9 @@ tbody tr:first-child th, tbody tr:first-child td { border-top: 0; }
 .sub { font-size: 20px; color: var(--navy); margin: 40px 0 16px; }
 .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
 .gallery img { border-radius: 12px; aspect-ratio: 4/3; object-fit: cover; width: 100%; }
+/* 사진이 한 장이면 (포스터 등) 자르지 않고 원본 비율로 크게 */
+.gallery a:only-child { grid-column: 1 / -1; }
+.gallery a:only-child img { aspect-ratio: auto; object-fit: contain; width: auto; max-width: 100%; max-height: 900px; }
 .file-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 14px 18px; border: 1px solid var(--line); border-radius: 12px; margin-bottom: 10px; }
 .file-name { font-weight: 600; }
 .file-name::before { content: 'PDF'; font-size: 11px; font-weight: 800; color: #fff; background: var(--danger); border-radius: 4px; padding: 2px 5px; margin-right: 8px; vertical-align: 2px; }

@@ -1,102 +1,67 @@
 # 한국교원대학교 과학교육연구소 홈페이지
 
-의뢰서(2026) 기준으로 만든 실제 작동하는 홈페이지입니다. Node.js 서버 하나로 공개 페이지, 게시판(학술행사·간행물·소식), 관리자 글 작성 기능이 모두 동작합니다.
+https://knue-sei.github.io — GitHub Pages로 운영하는 연구소 홈페이지입니다.
+한국어판은 `/`, 영문판은 `/en/` (상단 `English` / `한국어` 버튼으로 전환).
 
-## 바로 실행하기 (Windows)
+> 글을 올리실 교수님들은 **[홈페이지_사용안내.md](홈페이지_사용안내.md)** 를 참고해 주세요.
+글은 **웹 관리자(https://knue-sei.github.io/admin/)** 에서 작성하며, 저장하면 1~2분 뒤 사이트에 반영됩니다.
 
-1. [Node.js LTS](https://nodejs.org/ko)를 설치합니다 (18 이상).
-2. 이 폴더의 **실행하기.bat**을 더블클릭합니다.
-   - 처음 한 번은 구성요소 설치 후 **관리자 비밀번호(8자 이상)** 를 두 번 입력합니다.
-   - 브라우저에서 http://localhost:3000 이 열립니다.
+## 구조
 
-직접 명령어로 실행할 때:
+| 폴더·파일 | 내용 |
+|---|---|
+| `content/events`, `content/publications`, `content/news` | 게시글 (글 1개 = JSON 파일 1개) |
+| `uploads/` | 관리자가 올린 사진·PDF |
+| `public/` | 디자인(CSS)·로고·최초 자료(사진, 포스터, 논총 표지·목차 PDF) |
+| `lib/content.js` | 고정 문구 (연구 분야, 연구진, 영문 논총명·연구진 영문 이름) |
+| `lib/views.js` | 화면 구성, 한국어·영어 화면 문구 (`T.ko`, `T.en`) |
+| `lib/pages.js` | 공개 페이지 주소 목록 (로컬 서버와 게시에 공통) |
+| `cms/` | 웹 관리자(Decap CMS) 화면과 설정 → 사이트의 `/admin/` |
+| `scripts/export-static.js` | 사이트 전체를 HTML로 생성 (`npm run export` → `_site/`) |
+| `.github/workflows/pages.yml` | main에 변경이 생기면 자동으로 생성·게시 |
+| `server.js` | 내 PC에서 미리보기·오프라인 관리자로 쓰는 로컬 서버 |
+
+## 최초 1회 설정
+
+### 1. GitHub Pages 켜기
+저장소 **Settings → Pages → Build and deployment → Source: `GitHub Actions`** 선택.
+이후 main에 push할 때마다 자동으로 게시됩니다. 진행 상황은 저장소 **Actions** 탭에서 확인할 수 있습니다.
+
+### 2. 웹 관리자 로그인 설정 (GitHub 로그인 중계)
+GitHub Pages에는 서버가 없어 로그인 중계 서비스가 필요합니다. 무료인 Netlify의 중계 기능만 사용합니다.
+
+1. **GitHub OAuth 앱 만들기**: GitHub → 조직 `knue-sei` → Settings → Developer settings → OAuth Apps → New OAuth App
+   - Application name: `과학교육연구소 관리자`
+   - Homepage URL: `https://knue-sei.github.io`
+   - Authorization callback URL: `https://api.netlify.com/auth/done`
+   - 만든 뒤 **Client ID**와 **Generate a new client secret**으로 만든 **Client secret**을 메모
+2. **Netlify 사이트 만들기**: https://app.netlify.com 가입 → Add new site → Deploy manually → 아무 폴더(예: 빈 `index.html` 하나)를 끌어다 놓기
+   - Site configuration → Change site name → `knue-sei-cms` (다른 이름이면 `cms/config.yml`의 `site_domain` 수정)
+3. **Netlify에 GitHub 연결**: 그 사이트의 Site configuration → Access & security → OAuth → Install provider → GitHub → 1번의 Client ID / Client secret 입력
+4. https://knue-sei.github.io/admin/ → **Login with GitHub**
+
+글을 쓸 사람은 GitHub 계정이 있어야 하고, 저장소 `knue-sei/knue-sei.github.io`에 **Write 권한**이 있어야 합니다 (조직 → People 또는 저장소 Settings → Collaborators에서 추가).
+
+## 글 작성 (웹 관리자)
+
+1. https://knue-sei.github.io/admin/ 로그인
+2. 왼쪽에서 **학술행사 / 간행물 / 소식** 선택 → **새 ○○** 또는 기존 글 선택
+3. 제목·날짜·한 줄 소개·본문, 사진·PDF 입력 → **공개 여부** 선택
+   - `(영문)` 칸은 영문판에 표시됩니다. 비워 두면 영문판에도 한글 내용이 나옵니다.
+   - `공개`만 사이트에 표시됩니다. `임시저장`·`비공개`는 사이트에 나오지 않습니다.
+4. 오른쪽 위 **Publish(게시)** → 1~2분 뒤 사이트 반영
+5. 삭제는 글 화면의 **Delete entry** (확인 창 표시)
+
+**저장소가 공개(Public)이므로 `임시저장`·`비공개` 글과 올린 파일도 GitHub에서는 누구나 볼 수 있습니다. 공개해도 되는 내용만 올려 주세요.** 사진은 JPG·PNG·WEBP·GIF, 첨부는 PDF를 사용합니다.
+
+## 내 PC에서 미리보기 (선택)
+
+[Node.js LTS](https://nodejs.org/ko)(18 이상) 설치 후:
 
 ```
 npm install
-npm run set-password      # 관리자 비밀번호 설정 (언제든 다시 실행해 변경 가능)
-npm start                 # http://localhost:3000
+npm run set-password   # 로컬 관리자 비밀번호 (data/admin.json에 해시로만 저장, 저장소에 올라가지 않음)
+npm start              # http://localhost:3000
 ```
 
-## 화면 구성
-
-| 주소 | 화면 |
-|---|---|
-| `/` | 홈 (연구의 방향, 최근 학술행사·간행물·소식 각 3건) |
-| `/about` | 연구소 소개 + 기본 정보 표 |
-| `/research` | 연구 분야 5개 |
-| `/people` | 연구진 9명 (이름·소속·대학 이메일, 이메일 클릭 시 메일 작성) |
-| `/events`, `/events/번호` | 학술행사 목록 / 상세 (사진, 포스터 보기·다운로드) |
-| `/publications`, `/publications/번호` | 청람과학교육연구논총 목록 / 상세 (표지·목차 PDF 보기·내려받기) |
-| `/news`, `/news/번호` | 공지사항 목록 / 상세 |
-| `/admin/login` → `/admin` | 관리자 로그인 → 게시글 관리 |
-
-## 관리자 비밀번호
-
-- 비밀번호는 **처음 `실행하기.bat`을 실행할 때 직접 정한 값**입니다. 파일에는 암호화된 값만 저장되므로 원래 비밀번호를 확인할 수는 없습니다.
-- 잊어버렸거나 바꾸려면 **`비밀번호_변경.bat`** 을 더블클릭해 새로 설정하세요. (사이트가 켜져 있어도 바로 적용됩니다)
-
-## 관리자 사용법
-
-- 상단 **관리자 로그인** → 비밀번호 입력 → **게시글 관리**
-- **새 글 작성**에서 소식 / 학술행사 / 간행물 선택
-- 작성 흐름: **임시저장 → 미리보기 → 공개**. 공개된 글도 수정·비공개 전환·삭제 가능(삭제 전 확인 화면 표시)
-- 사진은 JPG·PNG·WEBP·GIF, 첨부는 PDF만, 파일당 30MB 이하
-- 공개하는 즉시 목록과 홈의 ‘최근’ 영역에 반영됩니다.
-
-## 저장 위치
-
-- 게시글: `data/db.json` (첫 실행 시 행사 3건·간행물 3건이 자동 등록됨)
-- 관리자 비밀번호: `data/admin.json` (scrypt 해시로만 저장, 원문 저장 안 함)
-- 업로드 파일: `uploads/`
-- 최초 자료: `public/assets/` (2025 행사 사진 2장, 2024 포스터 PDF, 논총 표지·목차 PDF 3건)
-
-**백업할 폴더는 `data/`와 `uploads/` 두 개입니다.**
-
-## 학교 서버·클라우드에 올릴 때
-
-| 환경변수 | 설명 |
-|---|---|
-| `PORT` | 포트 (기본 3000) |
-| `DATA_DIR` | 게시글·비밀번호 저장 폴더 (기본 `./data`) |
-| `UPLOAD_DIR` | 업로드 파일 폴더 (기본 `./uploads`) |
-| `SECURE_COOKIE=1` | HTTPS로 운영할 때 설정 |
-| `TRUST_PROXY=1` | Nginx 등 프록시 뒤에서 운영할 때 설정 |
-| `ADMIN_PASSWORD` | `set-password`를 실행할 수 없는 환경에서만 사용 |
-
-Render·Railway 같은 클라우드는 재배포 시 디스크가 초기화될 수 있으므로 **영구 디스크(Persistent Disk)** 를 연결하고 `DATA_DIR`, `UPLOAD_DIR`을 그 경로로 지정하세요.
-
-## GitHub Pages 게시 (knue-sei.github.io)
-
-GitHub Pages는 정적 파일만 호스팅하므로, **글 작성은 내 PC에서 하고 결과 HTML(`docs/`)만 게시**합니다. 게시된 사이트에는 관리자 로그인 메뉴가 표시되지 않습니다.
-
-최초 1회 설정
-1. GitHub에서 조직 `knue-sei` 생성 (github.com → 우측 상단 + → New organization → Free)
-2. 조직 안에 저장소 **`knue-sei.github.io`** 생성 (Public)
-3. 이 폴더를 그 저장소로 push
-4. 저장소 **Settings → Pages → Build and deployment → Source: Deploy from a branch → Branch: `main` / `/docs` → Save**
-5. 1~2분 뒤 https://knue-sei.github.io 접속
-
-글을 올릴 때마다
-1. `실행하기.bat` → http://localhost:3000 관리자에서 글 작성·공개
-2. `게시용_파일_만들기.bat` 실행 (`npm run export`, `docs/` 갱신)
-3. 변경된 파일(`docs/`, `data/db.json`, `uploads/`)을 커밋·push → 1~2분 뒤 반영
-
-`data/db.json`과 `uploads/`도 저장소에 함께 올라가므로 다른 PC에서 받아도 이어서 작성할 수 있습니다. 비밀번호 파일(`data/admin.json`)은 올라가지 않으니 새 PC에서는 `비밀번호_변경.bat`으로 다시 설정하세요. **저장소가 공개이므로 공개해도 되는 파일만 업로드하세요.**
-
-## 무료 시범 배포 (Render)
-
-1. GitHub에 새 저장소를 만들고 이 폴더의 파일을 올립니다 (`node_modules`, `data` 폴더 제외).
-2. Render(render.com)에서 **New → Blueprint** → 저장소 선택 → `ADMIN_PASSWORD` 입력 → Apply.
-3. 몇 분 뒤 `https://knue-sei-xxxx.onrender.com` 주소가 생깁니다.
-
-무료 요금제 주의: 15분 동안 방문자가 없으면 잠들었다가 다음 접속 때 1분쯤 걸려 깨어납니다. 또 서버가 다시 시작되면 **관리자가 올린 글·파일이 사라지고 처음 상태(행사 3건·간행물 3건)로 돌아갑니다.** 시범용으로만 쓰세요.
-
-## 로고
-
-상단 로고(`public/assets/knue-official-logo.svg`)와 브라우저 탭 아이콘(`public/favicon.png`)은 한국교원대학교 UI매뉴얼(knue.ac.kr) 공식 심벌마크 EPS를 웹용 SVG로 변환한 것입니다.
-
-## 수정할 곳
-
-- 고정 문구(연구 분야, 연구진): `lib/content.js`
-- 화면 문구·구성: `lib/views.js`
-- 색상·디자인: `public/css/style.css`
+로컬 관리자에서 쓴 글도 `content/`에 저장되므로 커밋·push하면 사이트에 반영됩니다. 게시될 HTML을 직접 확인하려면 `npm run export` 후 `_site/`를 확인하세요.

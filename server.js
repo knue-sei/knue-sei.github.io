@@ -9,6 +9,7 @@ const store = require('./lib/store');
 const auth = require('./lib/auth');
 const V = require('./lib/views');
 const A = require('./lib/admin-views');
+const P = require('./lib/pages');
 
 const PORT = process.env.PORT || 3000;
 const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, 'uploads');
@@ -38,31 +39,12 @@ function render(res, opts, status = 200) {
   res.status(status).type('html').send(V.layout({ admin: res.locals.admin, ...opts }));
 }
 
-/* =================== 공개 페이지 =================== */
-app.get('/', (req, res) => {
-  render(res, {
-    title: '', active: '/',
-    body: V.home({
-      events: store.list('event').slice(0, 3),
-      pubs: store.list('publication').slice(0, 3),
-      news: store.list('news').slice(0, 3),
-    }),
-  });
+/* =================== 공개 페이지 (한국어 /, 영어 /en/) =================== */
+app.get('*', (req, res, next) => {
+  const page = P.pageFor(req.path);
+  if (!page) return next();
+  render(res, page);
 });
-app.get('/about', (req, res) => render(res, { title: '연구소 소개', active: '/about', body: V.about() }));
-app.get('/research', (req, res) => render(res, { title: '연구 분야', active: '/research', body: V.research() }));
-app.get('/people', (req, res) => render(res, { title: '연구진', active: '/people', body: V.people() }));
-
-for (const [type, t] of Object.entries(store.TYPES)) {
-  app.get(`/${t.path}`, (req, res) => {
-    render(res, { title: t.label, active: `/${t.path}`, body: V.listPage(type, store.list(type)) });
-  });
-  app.get(`/${t.path}/:id(\\d+)`, (req, res) => {
-    const p = store.get(req.params.id);
-    if (!p || p.type !== type || p.status !== 'published') return notFound(res);
-    render(res, { title: p.title, active: `/${t.path}`, body: V.detailPage(p) });
-  });
-}
 
 /* =================== 관리자 =================== */
 function requireAdmin(req, res, next) {
@@ -150,8 +132,14 @@ function collect(req, type, existing = {}) {
     date: /^\d{4}-\d{2}-\d{2}$/.test(b.date || '') ? b.date : '',
     summary: (b.summary || '').trim(),
     body: (b.body || '').replace(/\r\n/g, '\n').trim(),
+    title_en: (b.title_en || '').trim(),
+    summary_en: (b.summary_en || '').trim(),
+    body_en: (b.body_en || '').replace(/\r\n/g, '\n').trim(),
   };
-  if (type === 'publication') data.volume = (b.volume || '').trim();
+  if (type === 'publication') {
+    data.volume = (b.volume || '').trim();
+    data.volume_en = (b.volume_en || '').trim();
+  }
 
   const rmPhotos = new Set(toArray(b.removePhoto).map(Number));
   const rmAtt = new Set(toArray(b.removeAttachment).map(Number));
@@ -207,13 +195,13 @@ app.post('/admin/new/:type', requireAdmin, handleUpload, (req, res) => {
   afterSave(res, post, req.body.action);
 });
 
-app.get('/admin/posts/:id(\\d+)/edit', requireAdmin, (req, res) => {
+app.get('/admin/posts/:id([A-Za-z0-9-]+)/edit', requireAdmin, (req, res) => {
   const p = store.get(req.params.id);
   if (!p) return notFound(res);
   render(res, { title: '글 수정', active: '/admin', body: A.form({ type: p.type, post: p }) });
 });
 
-app.post('/admin/posts/:id(\\d+)/edit', requireAdmin, handleUpload, (req, res) => {
+app.post('/admin/posts/:id([A-Za-z0-9-]+)/edit', requireAdmin, handleUpload, (req, res) => {
   const p = store.get(req.params.id);
   if (!p) { cleanupFiles(req.files); return notFound(res); }
   const { data, removed, error } = collect(req, p.type, p);
@@ -227,13 +215,13 @@ app.post('/admin/posts/:id(\\d+)/edit', requireAdmin, handleUpload, (req, res) =
   afterSave(res, post, req.body.action);
 });
 
-app.get('/admin/posts/:id(\\d+)/preview', requireAdmin, (req, res) => {
+app.get('/admin/posts/:id([A-Za-z0-9-]+)/preview', requireAdmin, (req, res) => {
   const p = store.get(req.params.id);
   if (!p) return notFound(res);
   render(res, { title: `미리보기: ${p.title}`, active: `/${store.TYPES[p.type].path}`, body: V.detailPage(p, { preview: A.previewBar(p) }) });
 });
 
-app.post('/admin/posts/:id(\\d+)/status', requireAdmin, (req, res) => {
+app.post('/admin/posts/:id([A-Za-z0-9-]+)/status', requireAdmin, (req, res) => {
   const p = store.get(req.params.id);
   if (!p) return notFound(res);
   const status = ['published', 'hidden', 'draft'].includes(req.body.status) ? req.body.status : p.status;
@@ -241,13 +229,13 @@ app.post('/admin/posts/:id(\\d+)/status', requireAdmin, (req, res) => {
   res.redirect(`/admin?type=${p.type}&msg=${status === 'published' ? 'published' : 'hidden'}`);
 });
 
-app.get('/admin/posts/:id(\\d+)/delete', requireAdmin, (req, res) => {
+app.get('/admin/posts/:id([A-Za-z0-9-]+)/delete', requireAdmin, (req, res) => {
   const p = store.get(req.params.id);
   if (!p) return notFound(res);
   render(res, { title: '삭제 확인', active: '/admin', body: A.confirmDelete(p) });
 });
 
-app.post('/admin/posts/:id(\\d+)/delete', requireAdmin, (req, res) => {
+app.post('/admin/posts/:id([A-Za-z0-9-]+)/delete', requireAdmin, (req, res) => {
   const p = store.remove(req.params.id);
   if (!p) return notFound(res);
   deleteStored([...(p.photos || []), ...(p.attachments || [])]);
@@ -257,10 +245,10 @@ app.post('/admin/posts/:id(\\d+)/delete', requireAdmin, (req, res) => {
 // 관리자 하위 경로는 로그인 필요
 app.use('/admin', requireAdmin);
 
-function notFound(res) {
-  render(res, { title: '페이지를 찾을 수 없습니다', active: '', body: V.notFound() }, 404);
+function notFound(res, lang = 'ko') {
+  render(res, { title: V.T[lang].nfHead.replace(/\.$/, ''), active: '', lang, body: V.notFound(lang) }, 404);
 }
-app.use((req, res) => notFound(res));
+app.use((req, res) => notFound(res, P.langOf(req.path)));
 
 app.use((err, req, res, next) => {
   console.error(err);
