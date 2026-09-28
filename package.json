@@ -2,18 +2,11 @@
   "name": "knue-science-education-institute",
   "version": "1.0.0",
   "description": "한국교원대학교 과학교육연구소 홈페이지",
-  "main": "server.js",
   "private": true,
   "scripts": {
-    "start": "node server.js",
-    "set-password": "node scripts/set-password.js",
     "export": "node scripts/export-static.js"
   },
   "engines": {
     "node": ">=18"
-  },
-  "dependencies": {
-    "express": "^4.21.2",
-    "multer": "^2.0.2"
   }
 }

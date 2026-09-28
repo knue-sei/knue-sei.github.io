@@ -1,6 +1,5 @@
 node_modules/
 _site/
 # 게시글은 content/, 업로드 파일은 uploads/에 저장소와 함께 보관
-# data/에는 로컬 관리자 비밀번호 해시·세션 키·내부 문서만 있으므로 올리지 않음
+# data/는 내부 참고자료(계획서 등) 보관용이므로 올리지 않음
 data/
-content/**/*.tmp

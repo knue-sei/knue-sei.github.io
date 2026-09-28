@@ -11,13 +11,12 @@ const ROOT = path.join(__dirname, '..');
 const OUT = process.env.EXPORT_DIR || path.join(ROOT, '_site');
 const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(ROOT, 'uploads');
 
-store.load();
 fs.rmSync(OUT, { recursive: true, force: true });
 fs.cpSync(path.join(ROOT, 'public'), OUT, { recursive: true });
 
 function writeHtml(file, opts) {
   fs.mkdirSync(path.dirname(file), { recursive: true });
-  fs.writeFileSync(file, V.layout({ ...opts, staticSite: true }), 'utf8');
+  fs.writeFileSync(file, V.layout(opts), 'utf8');
 }
 
 const urls = P.allUrls();
