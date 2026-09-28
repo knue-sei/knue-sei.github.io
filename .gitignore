@@ -1,0 +1,7 @@
+node_modules/
+# 게시글(data/db.json)과 업로드 파일은 저장소에 함께 보관 (다른 PC에서도 이어서 작성 가능)
+# 비밀번호 해시·세션 키·내부 문서는 올리지 않음
+data/admin.json
+data/session.key
+data/*.tmp
+data/*.docx

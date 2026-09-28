@@ -1,0 +1,15 @@
+# Render 배포 설정 (무료 시범 운영용)
+services:
+  - type: web
+    name: knue-sei
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: ADMIN_PASSWORD   # 배포할 때 Render 화면에서 직접 입력
+        sync: false
+      - key: SECURE_COOKIE
+        value: "1"
+      - key: TRUST_PROXY
+        value: "1"
