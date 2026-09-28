@@ -1,5 +1,5 @@
 // GitHub Pages용 정적 사이트 만들기:  npm run export
-// 공개된 글만 HTML로 만들어 _site/ 폴더에 저장 (한국어 /, 영어 /en/) + 웹 관리자(cms/ → /admin/) 포함
+// 공개된 글만 HTML로 만들어 _site/ 폴더에 저장 (한국어 /, 영어 /en/)
 // GitHub Actions(.github/workflows/pages.yml)가 push 때마다 실행해 게시함
 const fs = require('fs');
 const path = require('path');
@@ -35,7 +35,6 @@ for (const p of store.list(null)) {
   }
 }
 
-fs.cpSync(path.join(ROOT, 'cms'), path.join(OUT, 'admin'), { recursive: true });
 fs.writeFileSync(path.join(OUT, '.nojekyll'), '');
 
 console.log(`정적 사이트를 만들었습니다: ${path.relative(ROOT, OUT) || OUT} (페이지 ${urls.length}개)`);
