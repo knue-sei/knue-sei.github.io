@@ -196,7 +196,7 @@ tbody tr:first-child th, tbody tr:first-child td { border-top: 0; }
 .footer-inner { display: flex; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
 .footer-name { color: #fff; font-weight: 800; font-size: 17px; margin: 0; }
 .footer-en { margin: 2px 0 12px; }
-.footer-motto { margin: 0; }
+.footer-contact { margin: 0; font-style: normal; line-height: 1.6; }
 .footer-nav { display: flex; flex-wrap: wrap; gap: 6px 18px; align-content: flex-start; }
 .footer-nav a { color: #dbe3ef; text-decoration: none; }
 .footer-nav a:hover { text-decoration: underline; }
